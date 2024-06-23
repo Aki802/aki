@@ -1,0 +1,71 @@
+Sub BackdateTimesInCSV()
+
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim csvFilePath As String
+    Dim lastRow As Long
+    Dim i As Long
+    Dim searchValue As String
+    Dim dateColumnName As String
+    Dim dateColumn As Long
+    Dim dateFindCell As Range
+    Dim dateCell As Range
+    Dim foundCell As Range
+    Dim dateFormat As String
+    Dim backdatedTime As Date
+    Dim originalDateTime As Date
+    
+    ' CSVファイルのパスを設定する
+    csvFilePath = "C:\Users\hiroo\Desktop\melco\日付変更\testdata\mlg_123.csv"
+    
+    ' Excelアプリケーションを新規作成し、CSVファイルを開く
+    Set wb = Workbooks.Open(Filename:=csvFilePath)
+    Set ws = wb.Sheets(1) ' 仮に最初のシートを対象とする
+    
+    ' 検索する文字列を設定する
+    searchValue = "Detected  Date and Time (UTC time)"
+    
+    ' 文字列が含まれる列を探す
+    On Error Resume Next
+    Set foundCell = ws.Cells.Find(What:=searchValue, LookIn:=xlValues, LookAt:=xlWhole)
+    On Error GoTo 0
+    
+    If foundCell Is Nothing Then
+        MsgBox "CSVファイル内で日時データが見つかりませんでした。", vbExclamation
+        wb.Close SaveChanges:=False
+        Exit Sub
+    Else
+        ' 文字列が含まれる列を特定する
+        dateColumn = foundCell.Column
+        
+        ' 日付のフォーマットを設定する（CSVファイルの書式に合わせる）
+        dateFormat = "yyyy/mm/dd hh:mm:ss" ' 例として、年/月/日 時:分:秒
+        
+        ' 時間を戻す対象となる日時データが入力されているセルを探す
+        lastRow = ws.Cells(ws.Rows.Count, dateColumn).End(xlUp).Row
+        
+        For i = foundCell.Row + 1 To lastRow
+            If IsDate(ws.Cells(i, dateColumn).Value) Then
+                ' 日時データが入力されているセルを見つけた場合
+                
+                ' 日時を取得する
+                originalDateTime = CDate(ws.Cells(i, dateColumn).Value)
+                
+                ' 時間を4時間戻す
+                backdatedTime = DateAdd("h", -4, originalDateTime)
+                
+                ' 書式を設定してセルに反映する
+                ws.Cells(i, dateColumn).Value = Format(backdatedTime, dateFormat)
+            End If
+        Next i
+    End If
+    
+    ' ワークブックを保存して閉じる
+    wb.Save
+    wb.Close
+    
+    ' メッセージを表示する
+    MsgBox "日時データの処理が完了しました。", vbInformation
+
+End Sub
+

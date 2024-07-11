@@ -1,4 +1,40 @@
-cd /d "C:\"
-call activate
-cd /d "../.."
-cmd /k
+仮想環境構築AkiRPA
+python -m venv AkiRPA
+.\AkiRPA\Scripts\activate
+
+GITにアップロード
+
+git fetch origin
+git reset --hard origin/main
+
+
+git init
+git clone https://github.com/Aki802/aki
+GITフォルダに置き
+git add AutoGUI
+git commit -m "commit"
+git push origin main
+実効
+
+python　exe化
+pyinstaller AutoGUI.py --onefile --noconsole
+
+-onefile ：関連するファイルを1つにまとめてexeファイルを作成します。
+
+pyinstaller test.py --onefile
+
+
+--noconsole ：コンソール（コマンドプロンプト）を表示しません。
+
+pyinstaller test.py --noconsole
+
+
+--icon：exeファイルのアイコンを変更できます。
+(exe化するスクリプトと同一ディレクトリに*.icoファイルを置いておくと簡単です）
+
+pyinstaller test.py --icon=test.ico
+
+
+上記以外にもたくさんのオプションがありますので詳しくは公式サイトもご確認ください。
+（https://pyinstaller.org/en/stable/)
+
